@@ -28,12 +28,6 @@ void draw () {
     threads[i] = foo;
     foo.start();
   }
-  boolean ready = false;
-  while (!ready) {
-    for (IterThread thread : threads){
-      ready = ready || thread.running;
-    }
-  }
   while(writethread.running);
   writethread = new WriteThread();
   writethread.start();

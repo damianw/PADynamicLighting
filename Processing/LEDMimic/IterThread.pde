@@ -24,6 +24,7 @@ class IterThread extends Thread {
     fill(avg); 
     rect(start/2, 0, segmentWidth/2, displayHeight/10);
     colors[i] = avg;
+    quit();
   }
 
   void quit() {
