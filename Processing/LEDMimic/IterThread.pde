@@ -1,3 +1,5 @@
+// thread for an individual LED segment
+// calculates the appropriate color and saves it to 'colors'
 class IterThread extends Thread {
   boolean running;
   int iter;
@@ -16,7 +18,6 @@ class IterThread extends Thread {
     int i = iter;
     int start = i*segmentWidth;
     int end = start + segmentWidth;
-    //println("Segment: " + start + ", " + segmentWidth);
     PImage segment = screenShot.get(start, 0, segmentWidth, displayHeight);
     //uncomment for single row at top
     //PImage segment = screenShot.get(start, 0, segmentWidth, 1);
