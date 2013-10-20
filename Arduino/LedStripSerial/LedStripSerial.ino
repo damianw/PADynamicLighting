@@ -44,7 +44,7 @@ void loop()
       }
       ledStrip.write(colors, LED_COUNT);  
     }
-    else if (inchar == 'p') {
+    else if (inchar == 't') {
       if (pwr_state) {
         digitalWrite(PWR_OUT, LOW);
         pwr_state = false;

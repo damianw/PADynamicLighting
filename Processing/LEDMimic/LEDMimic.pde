@@ -16,7 +16,7 @@ void setup() {
   size(displayWidth/2, displayHeight/10); // debug window
   segmentWidth = displayWidth/10; // 10 segments
   screenShot = getScreen(); // start with a screenshot
-  port = new Serial(this, Serial.list()[1], 115200); // connect to arduino
+  port = new Serial(this, Serial.list()[0], 115200); // connect to arduino
   // make sure to set the serial port as appropriate
 }
 
