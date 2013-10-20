@@ -5,45 +5,61 @@ PololuLedStrip<12> ledStrip;
 
 // Create a buffer for holding 60 colors.  Takes 180 bytes.
 #define LED_COUNT 60
+#define PWR_OUT 8
 rgb_color colors[LED_COUNT];
-int pos = -1; // variable for holding segment position
-// color to be set
+int oldpos = -1;
+bool pwr_state;
 rgb_color color = (rgb_color){255, 255, 255};
 
 void setup()
 {
-  Serial.begin(115200); // change to desired speed
+  Serial.begin(115200);
+  pinMode(PWR_OUT, OUTPUT);
+  digitalWrite(PWR_OUT, HIGH);
+  pwr_state = true;
 }
 
 void loop()
 {
   if ( Serial.available()) {
-    char inchar = Serial.read(); //read in the command
-    switch(inchar) { // two commands available
-      case 'p': // set the pos
-        while(!Serial.available());
-        pos = Serial.read();
-        break;
-      case 'c': // set the color of pos
-        while(!Serial.available());
-        byte red = Serial.read();
-        while(!Serial.available());
-        byte green = Serial.read();
-        while(!Serial.available());
-        byte blue = Serial.read();
-        // GBR is used because the library is fucked
-        color = (rgb_color){green, blue, red};
-        if (pos == -1) { // -1 sets all the segments
-          for (int i = 0; i < 10; i++) {
-            colors[i] = color;
-          }
-        } else { // otherwise set them in reverse
-          colors[9-pos] = color;
-        }
-        ledStrip.write(colors, LED_COUNT); // write the colors
-        break;  
+    char inchar = Serial.read();
+    if (inchar == 'p') {
+      while(!Serial.available());
+      oldpos = Serial.read();
     }
-
+    else if (inchar == 'c') {
+      while(!Serial.available());
+      byte red = Serial.read();
+      while(!Serial.available());
+      byte green = Serial.read();
+      while(!Serial.available());
+      byte blue = Serial.read();
+      color = (rgb_color){green, blue, red};
+      if (oldpos == -1) {
+        for (int i = 0; i < 10; i++) {
+          colors[i] = color;
+        }
+      } else {
+        colors[9-oldpos] = color;
+      }
+      ledStrip.write(colors, LED_COUNT);  
+    }
+    else if (inchar == 'p') {
+      if (pwr_state) {
+        digitalWrite(PWR_OUT, LOW);
+        pwr_state = false;
+      } else {
+        digitalWrite(PWR_OUT, HIGH);
+        pwr_state = true;
+      }
+    }
+    else if (inchar == 'u') {
+      digitalWrite(PWR_OUT, HIGH);
+      pwr_state = true;
+    }
+    else if (inchar == 'd') {
+      digitalWrite(PWR_OUT, LOW);
+      pwr_state = false;
+    }
   }
-
 }
