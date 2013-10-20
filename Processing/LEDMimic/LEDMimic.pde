@@ -5,37 +5,41 @@ import java.awt.image.BufferedImage;
 import java.awt.*;
 import processing.serial.*;
 
-PImage screenShot; // keep a global screenshot var
-Serial port; // to communicate with the arduino
-color[] colors = new color[10]; // array to hold colors for the strip
-WriteThread writethread = new WriteThread(); // thread writing to arduino
+PImage screenShot;
+Serial port;
+color[] colors = new color[10];
+boolean forward = true;
+WriteThread writethread = new WriteThread();
 
-int segmentWidth = 0; // constant pixel width of segment
+int segmentWidth = 0;
 
 void setup() {
-  size(displayWidth/2, displayHeight/10); // debug window
-  segmentWidth = displayWidth/10; // 10 segments
-  screenShot = getScreen(); // start with a screenshot
-  port = new Serial(this, Serial.list()[0], 115200); // connect to arduino
-  // make sure to set the serial port as appropriate
+  size(displayWidth/2, displayHeight/10);
+  segmentWidth = displayWidth/10;
+  screenShot = getScreen();
+  port = new Serial(this, Serial.list()[1], 115200);
 }
 
 void draw () {
-  screenShot = getScreen(); // take a screenshot
-  // TODO find a way to optimize this
-  IterThread threads[] = new IterThread[10]; // a thread for each segment
-  for (int i = 0; i < 10; i++){ // run each thread
+  screenShot = getScreen();
+  IterThread threads[] = new IterThread[10];
+  for (int i = 0; i < 10; i++){
     IterThread foo = new IterThread(i);
     threads[i] = foo;
     foo.start();
   }
-  // wait until the writethread is done, then write
+  boolean unready = true;
+  while (unready) {
+    unready = false;
+    for (IterThread thread : threads){
+      unready = unready || thread.running;
+    }
+  }
   while(writethread.running);
   writethread = new WriteThread();
   writethread.start();
 }
 
-//calculates the average color of a segment
 color average(PImage segment) {
   long rsum = 0, gsum = 0, bsum = 0;
   for (color pixel : segment.pixels) {
@@ -52,8 +56,6 @@ color average(PImage segment) {
   return color(rsum, gsum, bsum);
 }
 
-// takes a screenshot
-// TODO optimize this
 PImage getScreen() {
   GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
   GraphicsDevice[] gs = ge.getScreenDevices();

@@ -1,4 +1,3 @@
-// thread for writing the colors to the arduino
 class WriteThread extends Thread {
   boolean running;
  
@@ -12,7 +11,6 @@ class WriteThread extends Thread {
   }
 
   void run () {
-    // write each color to the arduino
     for (int i = 0; i < 10; i++){
       port.write("p" + (char)i + "c" + (char)red(colors[i])
         + (char)green(colors[i]) + (char)blue(colors[i]));
